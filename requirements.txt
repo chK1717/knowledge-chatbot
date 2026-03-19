@@ -1,0 +1,8 @@
+streamlit
+pandas
+numpy
+chromadb
+sentence-transformers
+rank-bm25
+pyxlsb
+llama-cpp-python

@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local data and heavy artifacts
+modeles/
+
+# Optional local/generated files
+*.log
+.DS_Store
+Thumbs.db
+
