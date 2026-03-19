@@ -10,6 +10,9 @@ env/
 
 # Local data and heavy artifacts
 modeles/
+modeles/infloat_multilingual-e5-base/
+modeles/intfloat_multilingual-e5-base/
+modeles/qwen/
 
 # Optional local/generated files
 *.log
