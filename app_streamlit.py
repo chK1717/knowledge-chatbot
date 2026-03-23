@@ -21,9 +21,8 @@ from pyxlsb import open_workbook
 from rank_bm25 import BM25Okapi
 from sentence_transformers import SentenceTransformer
 
-# ══════════════════════════════════════════════════════════════════
 # CONFIGURATION
-# ══════════════════════════════════════════════════════════════════
+
 FILE_PATH  = Path("Extraction_Synthese_Modélisation_SDV5.xlsb")
 SHEET_NAME = "Modeling_Synthesis_SDV5"
 
@@ -44,9 +43,7 @@ CHROMA_DIR              = Path("sdv_chromadb")
 CACHE_BM25              = Path("sdv_bm25_cpu.pkl")
 LLM_MODEL_PATH          = Path("modeles/qwen/qwen2.5-3b-instruct-q8_0-005.gguf")
 
-# ══════════════════════════════════════════════════════════════════
 # SYSTEM PROMPT
-# ══════════════════════════════════════════════════════════════════
 SYSTEM_PROMPT = (
     'Tu es un assistant expert donnees vehicules EV/PHEV Stellantis.\n'
     'REGLES ABSOLUES :\n'
@@ -62,9 +59,7 @@ SYSTEM_PROMPT = (
 )
 
 
-# ══════════════════════════════════════════════════════════════════
 # DATACLASS
-# ══════════════════════════════════════════════════════════════════
 @dataclass
 class AppResources:
     df            : pd.DataFrame
@@ -79,9 +74,7 @@ class AppResources:
     llm_error     : str | None
 
 
-# ══════════════════════════════════════════════════════════════════
 # CHARGEMENT DONNEES
-# ══════════════════════════════════════════════════════════════════
 def _resolve_xlsb_path() -> Path:
     if FILE_PATH.exists():
         return FILE_PATH
@@ -260,9 +253,7 @@ def load_resources(collection_name: str) -> AppResources:
     )
 
 
-# ══════════════════════════════════════════════════════════════════
 # RECHERCHE HYBRIDE
-# ══════════════════════════════════════════════════════════════════
 def hybrid_search(
     question: str, resources: AppResources,
     top_k: int, alpha: float, score_min: float,
@@ -308,9 +299,7 @@ def hybrid_search(
     return results[:top_k]
 
 
-# ══════════════════════════════════════════════════════════════════
 # LLM
-# ══════════════════════════════════════════════════════════════════
 def ask_llm(
     resources: AppResources, prompt: str, max_tokens: int = 80
 ) -> tuple[str, float]:
@@ -367,9 +356,7 @@ def build_prompt(question: str, docs: list[dict[str, Any]]) -> str:
     )
 
 
-# ══════════════════════════════════════════════════════════════════
 # UTILITAIRES
-# ══════════════════════════════════════════════════════════════════
 def _normalize_text(value: str) -> str:
     txt = unicodedata.normalize("NFKD", value)
     txt = "".join(ch for ch in txt if not unicodedata.combining(ch))
@@ -505,9 +492,7 @@ def _extract_zone_after_preposition(question: str) -> str | None:
     return candidate or None
 
 
-# ══════════════════════════════════════════════════════════════════
 # MEMOIRE CONVERSATIONNELLE
-# ══════════════════════════════════════════════════════════════════
 def _is_followup(question: str) -> bool:
     q = question.lower().strip()
     mots_suivi = (
@@ -547,9 +532,7 @@ def contextualize_question(
     return question
 
 
-# ══════════════════════════════════════════════════════════════════
 # AFFICHAGE
-# ══════════════════════════════════════════════════════════════════
 def render_compact_sources(
     results: list[dict[str, Any]], max_items: int = 3
 ) -> None:
@@ -573,9 +556,7 @@ def render_compact_sources(
             break
 
 
-# ══════════════════════════════════════════════════════════════════
 # MAIN
-# ══════════════════════════════════════════════════════════════════
 def main() -> None:
     st.set_page_config(page_title="SmartBot SDV", layout="wide")
     st.title("SmartBot SDV — Stellantis")
@@ -748,7 +729,6 @@ def main() -> None:
         zones_trouvees_lc  = {_normalize_text(z) for z in zones_trouvees}
         explicit_effective = explicit_zone or explicit_zone_ctx
 
-        # Fix : zone absente seulement si zones reelles trouvees
         zone_absente  = False
         zone_demandee_label = zone_demandee or explicit_effective
 
@@ -776,7 +756,6 @@ def main() -> None:
             )
             return
 
-        # Generation LLM
         docs_for_llm = select_docs_for_llm(
             effective_question.strip(), results, llm_docs
         )
@@ -785,7 +764,6 @@ def main() -> None:
         with st.spinner("Generation LLM..."):
             answer, elapsed = ask_llm(resources, prompt, max_tokens=max_tokens)
 
-        # Safety net : fix "Non disponible" parasite
         has_values_in_answer = bool(
             re.search(r"min\s*:\s*\d", answer, flags=re.IGNORECASE)
             and re.search(r"max\s*:\s*\d", answer, flags=re.IGNORECASE)
@@ -797,7 +775,6 @@ def main() -> None:
         )
         answer_too_short = len(answer.strip().split("\n")) <= 2
 
-        # Declencher seulement si valeurs vraiment absentes
         if zones_trouvees and not has_values_in_answer and (all_stats_missing or answer_too_short):
             best   = _pick_best_row(resources, results)
             answer = _build_grounded_answer(best)

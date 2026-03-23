@@ -4,7 +4,8 @@ Application Streamlit de question-reponse sur des donnees SDV EV/PHEV (fichier X
 
 - recherche hybride (BM25 + embeddings)
 - stockage vectoriel ChromaDB
-- generation locale via modele GGUF (Qwen2.5-3b-instruct-q8)
+- modele RAG-embedder (intfloat_multilingual-e5-base)
+- generation locale via modele GGUF (qwen2.5-3b-instruct-q8_0-005.gguf)
 
 ## 1. Prerequis
 
