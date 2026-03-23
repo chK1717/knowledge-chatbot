@@ -10,6 +10,7 @@ env/
 
 # Local data and heavy artifacts
 modeles/*
+!modeles/.gitkeep
 modeles/qwen/
 Extraction_Synthese_Modélisation_SDV5.xlsb
 # Optional local/generated files
